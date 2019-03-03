@@ -413,11 +413,35 @@ class Reports extends Secure_Controller
 		$tabular_data = array();
 		foreach($report_data as $row)
 		{
-			$tabular_data[] = $this->xss_clean(array(
-				'payment_type' => $row['payment_type'],
-				'report_count' => $row['count'],
-				'amount_due' => to_currency($row['payment_amount'])
-			));
+			if($row['trans_group'] == '<HR>')
+			{
+				$tabular_data[] = $this->xss_clean(array(
+					'trans_group' => '--',
+					'trans_type' => '--',
+					'trans_count' => '--',
+					'trans_amount' => '--',
+					'trans_payments' => '--',
+					'trans_refunded' => '--',
+					'trans_due' => '--'
+				));
+			}
+			else
+			{
+				if(empty($row['trans_type']))
+				{
+					$row['trans_type'] = $this->lang->line('reports_trans_nopay_sales');
+				}
+
+				$tabular_data[] = $this->xss_clean(array(
+					'trans_group' => $row['trans_group'],
+					'trans_type' => $row['trans_type'],
+					'trans_count' => $row['trans_count'],
+					'trans_amount' => to_currency($row['trans_amount']),
+					'trans_payments' => to_currency($row['trans_payments']),
+					'trans_refunded' => to_currency($row['trans_refunded']),
+					'trans_due' => to_currency($row['trans_due'])
+				));
+			}
 		}
 
 		$data = array(
